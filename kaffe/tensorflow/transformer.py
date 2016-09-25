@@ -142,6 +142,10 @@ class TensorFlowMapper(NodeMapper):
         axis = (2, 3, 1, 0)[node.parameters.axis]
         return TensorFlowNode('concat', axis)
 
+    def map_reshape(self, node):
+        tf_shape = list(node.output_shape)
+        return TensorFlowNode('reshape', tf_shape)
+
     def map_dropout(self, node):
         return TensorFlowNode('dropout', node.parameters.dropout_ratio)
 

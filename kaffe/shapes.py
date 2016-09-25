@@ -27,6 +27,25 @@ def shape_not_implemented(node):
     raise NotImplementedError
 
 
+def shape_reshape(node):
+    assert len(node.parents) > 0
+    params = node.layer.parameters
+    assert(hasattr(params, 'shape'))
+    output_dims = list(params.shape.dim)
+    parent_shape = node.parents[0].output_shape
+    parent_size = reduce(lambda x, y: x * y, parent_shape, 1)
+    output_dims = [d if d != 0 else parent_shape[i]
+                   for i, d in enumerate(output_dims)]
+    dynamic_indexes = [i for i, x in enumerate(output_dims) if x == -1]
+    assert(len(dynamic_indexes) <= 1)
+    if dynamic_indexes:
+        # Take opposite of size to compensate for the -1
+        output_size = - reduce(lambda x, y: x * y, output_dims, 1)
+        output_dims[dynamic_indexes[0]] = parent_size / output_size
+    tf_shape = map(int, output_dims)
+    return TensorShape(*tf_shape)
+
+
 def shape_identity(node):
     assert len(node.parents) > 0
     return node.parents[0].output_shape

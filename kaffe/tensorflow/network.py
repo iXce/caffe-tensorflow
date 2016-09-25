@@ -180,6 +180,11 @@ class Network(object):
         return tf.concat(concat_dim=axis, values=inputs, name=name)
 
     @layer
+    def reshape(self, inputs, (n, c, h, w), name):
+        tf_shape = [n, h, w, c]
+        return tf.reshape(tensor=inputs, shape=tf_shape, name=name)
+
+    @layer
     def add(self, inputs, name):
         return tf.add_n(inputs, name=name)
 
